@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
 
 	docopt "github.com/docopt/docopt-go"
 )
@@ -56,7 +57,7 @@ Options:
 		if err != nil {
 			return err
 		}
-		p.Println(collections)
+		p.Println(strings.Join(collections, "\n"))
 
 	case arg.Export:
 		data, err := app.DbExport(ctx, arg.Collections)

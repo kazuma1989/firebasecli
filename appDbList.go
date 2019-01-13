@@ -2,6 +2,8 @@ package firebasecli
 
 import (
 	"context"
+
+	"google.golang.org/api/iterator"
 )
 
 // DbList lists up the all collections.
@@ -12,12 +14,15 @@ func (app *App) DbList(ctx context.Context) (collections []string, err error) {
 	}
 	defer dbClient.Close()
 
-	collectionRefs, err := dbClient.Collections(ctx).GetAll()
-	if err != nil {
-		return nil, err
-	}
+	for it := dbClient.Collections(ctx); ; {
+		ref, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
 
-	for _, ref := range collectionRefs {
 		collections = append(collections, ref.ID)
 	}
 

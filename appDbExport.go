@@ -18,8 +18,7 @@ func (app *App) DbExport(ctx context.Context, collectionPaths []string) (collect
 	for _, key := range collectionPaths {
 		allDocs := make(map[string]map[string]interface{})
 
-		it := dbClient.Collection(key).Documents(ctx)
-		for {
+		for it := dbClient.Collection(key).Documents(ctx); ; {
 			docSnap, err := it.Next()
 			if err == iterator.Done {
 				break
