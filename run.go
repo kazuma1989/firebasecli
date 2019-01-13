@@ -2,6 +2,7 @@ package firebasecli
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 )
 
@@ -12,14 +13,35 @@ func Run(args ...string) error {
 		return err
 	}
 
-	ctx := context.Background()
-	collections, err := app.DbList(ctx)
-
 	p := &Printer{
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
-	p.Println(collections)
+
+	ctx := context.Background()
+	switch {
+	case len(args) <= 1:
+
+	case args[0] == "db" && args[1] == "list":
+		collections, err := app.DbList(ctx)
+		if err != nil {
+			return err
+		}
+		p.Println(collections)
+
+	case args[0] == "db" && args[1] == "export":
+		data, err := app.DbExport(ctx, []string{"meta"})
+		if err != nil {
+			return err
+		}
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			return err
+		}
+		p.Println(string(jsonData))
+
+	default:
+	}
 
 	return nil
 }
