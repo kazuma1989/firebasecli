@@ -43,7 +43,5 @@ func NewApp(ctx context.Context, credentialPath string) (*App, error) {
 		return firebase.NewApp(ctx, nil, opt)
 	}()
 
-	return &App{
-		App: app,
-	}, err
+	return &App{App: app}, err
 }

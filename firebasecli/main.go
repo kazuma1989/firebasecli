@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	err := firebasecli.Run()
+	err := firebasecli.Run(os.Args[1:]...)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
