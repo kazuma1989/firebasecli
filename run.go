@@ -2,7 +2,6 @@ package firebasecli
 
 import (
 	"context"
-	"errors"
 	"os"
 
 	docopt "github.com/docopt/docopt-go"
@@ -39,8 +38,9 @@ Commands:
 
 	var arg struct {
 		Credential string
-		Command    string
-		Args       []string
+
+		Command string
+		Args    []string
 	}
 	if err := opts.Bind(&arg); err != nil {
 		// TODO add an error explanation.
@@ -54,12 +54,13 @@ Commands:
 	}
 
 	cmd := &Cmd{app, os.Stdout, os.Stderr}
+	_args := append([]string{arg.Command}, arg.Args...)
 	switch arg.Command {
 	case "auth":
-		return errors.New("no implementation yet")
+		return cmd.Auth(_args...)
 
 	case "db":
-		return cmd.Db(arg.Args...)
+		return cmd.Db(_args...)
 
 	default:
 		return ErrUnknownCommand

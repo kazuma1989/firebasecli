@@ -30,8 +30,10 @@ Options:
 	}
 
 	var arg struct {
-		Db          bool
-		List        bool
+		Db bool
+
+		List bool
+
 		Export      bool
 		Collections []string
 		Format      bool
