@@ -2,6 +2,7 @@ package firebasecli
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -19,29 +20,37 @@ type App struct {
 }
 
 // NewApp initializes an App.
+// If it failed to connect Firebase (e.g. invalid credential), it returns an error.
 func NewApp(ctx context.Context, credentialPath string) (*App, error) {
-	app, err := func() (*firebase.App, error) {
-		if credentialPath != "" {
-			opt := option.WithCredentialsFile(credentialPath)
-			return firebase.NewApp(ctx, nil, opt)
-		}
+	app, err := newFirebaseApp(ctx, credentialPath)
+	if err != nil {
+		err = fmt.Errorf("failed to connect Firebase: %v", err)
+	}
+	return &App{app}, err
+}
 
-		// When env var GOOGLE_APPLICATION_CREDENTIALS is specified.
-		// e.g.) export GOOGLE_APPLICATION_CREDENTIALS=path/to/key.json
-		app, err := firebase.NewApp(ctx, nil)
-		if err == nil {
-			return app, nil
-		}
-
-		exePath, err := os.Executable()
-		if err != nil {
-			return nil, err
-		}
-		defaultCredential := filepath.Join(filepath.Dir(exePath), DefaultCredential)
-
-		opt := option.WithCredentialsFile(defaultCredential)
+// newFirebaseApp initializes Firebase app with given credentials.
+// First, the argument will be taken, then an environmental variable will be taken when the first is not given.
+// Otherwise DefaultCredential will be taken.
+func newFirebaseApp(ctx context.Context, credentialPath string) (*firebase.App, error) {
+	if credentialPath != "" {
+		opt := option.WithCredentialsFile(credentialPath)
 		return firebase.NewApp(ctx, nil, opt)
-	}()
+	}
 
-	return &App{App: app}, err
+	// In case of env var GOOGLE_APPLICATION_CREDENTIALS specified.
+	// e.g.) export GOOGLE_APPLICATION_CREDENTIALS=path/to/key.json
+	app, err := firebase.NewApp(ctx, nil)
+	if err == nil {
+		return app, nil
+	}
+
+	exePath, err := os.Executable()
+	if err != nil {
+		return nil, err
+	}
+	defaultCredential := filepath.Join(filepath.Dir(exePath), DefaultCredential)
+
+	opt := option.WithCredentialsFile(defaultCredential)
+	return firebase.NewApp(ctx, nil, opt)
 }

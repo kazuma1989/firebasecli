@@ -2,79 +2,66 @@ package firebasecli
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"os"
-	"strings"
 
 	docopt "github.com/docopt/docopt-go"
 )
 
+// Version of the firebasecli.
+const Version = "0.0.1"
+
 // Run starts the app.
 func Run(args ...string) error {
-	app, err := NewApp(context.Background(), "")
-	if err != nil {
-		return err
-	}
-
-	opts, err := docopt.ParseArgs(`
-Manipulate Cloud Firestore.
+	opts, err := (&docopt.Parser{
+		OptionsFirst: true,
+	}).ParseArgs(`
+Manipulate Firebase as an admin.
 
 Usage:
-  firebasecli db list
-  firebasecli db export COLLECTIONS... [-f]
+  firebasecli [-c FILE] COMMAND [ARGS...]
+  firebasecli -h
 
 Options:
-  list  List the all collections.
+  -c, --credential FILE  Service account secret key.
+                         When omitted, environment variable GOOGLE_APPLICATION_CREDENTIALS will be used,
+                         otherwise "serviceAccountKey.json" will be used.
+  -h, --help             Show help (this screen).
 
-Options:
-  export COLLECTIONS  Export collections as JSON.
-  -f, --format        Output as formatted JSON.
-`, args, "")
+Commands:
+  auth  Manipulate Firebase Authentication.
+  db    Manipulate Cloud Firestore.
+`, args, Version)
 	if err != nil {
+		// TODO add an error explanation.
 		return err
 	}
 
 	var arg struct {
-		Db          bool
-		List        bool
-		Export      bool
-		Collections []string
-		Format      bool
+		Credential string
+		Command    string
+		Args       []string
 	}
 	if err := opts.Bind(&arg); err != nil {
+		// TODO add an error explanation.
 		return err
 	}
 
-	p := &Printer{
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-	}
-	ctx := context.Background()
-
-	switch {
-	case arg.List:
-		collections, err := app.DbList(ctx)
-		if err != nil {
-			return err
-		}
-		p.Println(strings.Join(collections, "\n"))
-
-	case arg.Export:
-		data, err := app.DbExport(ctx, arg.Collections)
-		if err != nil {
-			return err
-		}
-		var jsonData []byte
-		if arg.Format {
-			jsonData, err = json.MarshalIndent(data, "", "  ")
-		} else {
-			jsonData, err = json.Marshal(data)
-		}
-		if err != nil {
-			return err
-		}
-		p.Println(string(jsonData))
+	app, err := NewApp(context.Background(), arg.Credential)
+	if err != nil {
+		// TODO add an error explanation.
+		return err
 	}
 
-	return nil
+	cmd := &Cmd{app, os.Stdout, os.Stderr}
+	switch arg.Command {
+	case "auth":
+		return errors.New("no implementation yet")
+
+	case "db":
+		return cmd.Db(arg.Args...)
+
+	default:
+		return ErrUnknownCommand
+	}
 }
