@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"firebase.google.com/go/auth"
@@ -141,8 +139,6 @@ func (c *Cmd) authExport(format bool) error {
 }
 
 func (c *Cmd) authImport(accountFile, hashConfig, hashKey, saltSeparator string, rounds, memCost int) error {
-	ctx := context.Background()
-
 	if hashConfig != "" {
 		config, err := ioutil.ReadFile(hashConfig)
 		if err != nil {
@@ -150,28 +146,8 @@ func (c *Cmd) authImport(accountFile, hashConfig, hashKey, saltSeparator string,
 			return err
 		}
 
-		re := regexp.MustCompile(`hash_config\s*{\s*
-\s*algorithm\s*:\s*SCRYPT\s*,\s*
-\s*base64_signer_key\s*:\s*([a-zA-Z0-9/+]+=*)\s*,\s*
-\s*base64_salt_separator\s*:\s*([a-zA-Z0-9/+]+=*)\s*,\s*
-\s*rounds\s*:\s*([1-9][0-9]*)\s*,\s*
-\s*mem_cost\s*:\s*([1-9][0-9]*)\s*,\s*
-\s*}`)
-		values := re.FindStringSubmatch(string(config))
-		if len(values) <= 4 {
-			return ErrFailedToParseHashConfig
-		}
-
-		hashKey = values[1]
-		saltSeparator = values[2]
-		rounds, err = strconv.Atoi(values[3])
+		hashKey, saltSeparator, rounds, memCost, err = ParseHashConfig(string(config))
 		if err != nil {
-			// TODO add an error explanation.
-			return err
-		}
-		memCost, err = strconv.Atoi(values[4])
-		if err != nil {
-			// TODO add an error explanation.
 			return err
 		}
 	}
@@ -188,6 +164,7 @@ func (c *Cmd) authImport(accountFile, hashConfig, hashKey, saltSeparator string,
 		return err
 	}
 
+	ctx := context.Background()
 	result, err := c.App.AuthImport(ctx, users, hashKey, saltSeparator, rounds, memCost)
 	if err != nil {
 		return err
