@@ -19,7 +19,21 @@ type App struct {
 	*firebase.App
 }
 
+// Login logs into Firebase with a service account secret key.
+func (app *App) Login(ctx context.Context, credentialPath string) (err error) {
+	app.App, err = newFirebaseApp(ctx, credentialPath)
+	if err != nil {
+		err = fmt.Errorf("failed to connect Firebase: %v", err)
+	}
+	return err
+}
+
 // NewApp initializes an App.
+// Deprecated. Instead do:
+// ```
+// app := &App{}
+// app.Login(context.Background(), "/path/to/key.json")
+// ```
 // If it failed to connect Firebase (e.g. invalid credential), it returns an error.
 func NewApp(ctx context.Context, credentialPath string) (*App, error) {
 	app, err := newFirebaseApp(ctx, credentialPath)

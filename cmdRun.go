@@ -2,18 +2,26 @@ package firebasecli
 
 import (
 	"context"
-	"os"
+	"errors"
 	"sort"
 	"strings"
 
 	docopt "github.com/docopt/docopt-go"
 )
 
-// Commands holds commands.
-type Commands map[string]func(*Cmd, ...string) error
+// Version of the firebasecli.
+const Version = "0.0.1"
+
+var (
+	// ErrFailedToParseArgs is returned when args are not parseable.
+	ErrFailedToParseArgs = errors.New("failed to parse args")
+
+	// ErrUnknownCommand is returned when a given command is unknown/undefined.
+	ErrUnknownCommand = errors.New("unknown command")
+)
 
 // Run starts a sub command.
-func (c *Commands) Run(args ...string) error {
+func (c *Cmd) Run(args ...string) error {
 	usage := `
 Manipulate Firebase as an admin.
 
@@ -30,7 +38,7 @@ Options:
 Available commands:
   `
 	var availableCommands []string
-	for k := range *c {
+	for k := range c.Sub {
 		availableCommands = append(availableCommands, k)
 	}
 	sort.Strings(availableCommands)
@@ -41,8 +49,7 @@ Available commands:
 		OptionsFirst: allowUnknownFlagsAfterSubcommand,
 	}).ParseArgs(usage, args, Version)
 	if err != nil {
-		// TODO add an error explanation.
-		return err
+		return ErrFailedToParseArgs
 	}
 
 	var arg struct {
@@ -52,21 +59,21 @@ Available commands:
 		Args    []string
 	}
 	if err := opts.Bind(&arg); err != nil {
-		// TODO add an error explanation.
-		return err
+		return ErrFailedToParseArgs
 	}
 
-	run, ok := (*c)[arg.Command]
+	run, ok := c.Sub[arg.Command]
 	if !ok {
 		return ErrUnknownCommand
 	}
 
-	app, err := NewApp(context.Background(), arg.Credential)
-	if err != nil {
-		return err
+	if c.App != nil {
+		err := c.App.Login(context.Background(), arg.Credential)
+		if err != nil {
+			return err
+		}
 	}
 
-	cmd := &Cmd{app, os.Stdout, os.Stderr}
 	_args := append([]string{arg.Command}, arg.Args...)
-	return run(cmd, _args...)
+	return run(_args...)
 }

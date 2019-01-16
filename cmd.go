@@ -1,20 +1,30 @@
 package firebasecli
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
 )
 
-// ErrUnknownCommand is returned when a given command is unknown/undefined.
-var ErrUnknownCommand = errors.New("unknown command")
-
 // Cmd executes command.
 type Cmd struct {
+	// Sub holds commands.
+	Sub map[string]func(...string) error
+
 	App    *App
 	Stdout io.Writer
 	Stderr io.Writer
+}
+
+// NewCmd returns a new initialized Cmd.
+func NewCmd() *Cmd {
+	return &Cmd{
+		make(map[string]func(...string) error),
+
+		&App{},
+		os.Stdout,
+		os.Stderr,
+	}
 }
 
 // Print prints to stdout.
