@@ -15,6 +15,9 @@ import (
 const DefaultCredential = "serviceAccountKey.json"
 
 // App represents application.
+// App implements core methods called by CLI,
+// so to reuse or extend commands to fit your workflow,
+// it is recommended to use App instead of Cmd.
 type App struct {
 	*firebase.App
 }
@@ -26,21 +29,6 @@ func (app *App) Login(ctx context.Context, credentialPath string) (err error) {
 		err = fmt.Errorf("failed to connect Firebase: %v", err)
 	}
 	return err
-}
-
-// NewApp initializes an App.
-// Deprecated. Instead do:
-// ```
-// app := &App{}
-// app.Login(context.Background(), "/path/to/key.json")
-// ```
-// If it failed to connect Firebase (e.g. invalid credential), it returns an error.
-func NewApp(ctx context.Context, credentialPath string) (*App, error) {
-	app, err := newFirebaseApp(ctx, credentialPath)
-	if err != nil {
-		err = fmt.Errorf("failed to connect Firebase: %v", err)
-	}
-	return &App{app}, err
 }
 
 // newFirebaseApp initializes Firebase app with given credentials.

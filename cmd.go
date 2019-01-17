@@ -8,11 +8,18 @@ import (
 
 // Cmd executes command.
 type Cmd struct {
-	// Sub holds commands.
+	// Sub holds sub commands.
 	Sub map[string]Runnable
 
-	App    *App
+	// App holds App.
+	App *App
+
+	// Stdout holds standard output where a command outputs.
+	// Set nil to suppress output.
 	Stdout io.Writer
+
+	// Stderr holds standard error where a command outputs.
+	// Set nil to suppress output.
 	Stderr io.Writer
 }
 
@@ -20,7 +27,6 @@ type Cmd struct {
 func NewCmd() *Cmd {
 	return &Cmd{
 		make(map[string]Runnable),
-
 		&App{},
 		os.Stdout,
 		os.Stderr,
@@ -29,44 +35,48 @@ func NewCmd() *Cmd {
 
 // Print prints to stdout.
 func (c *Cmd) Print(a ...interface{}) (int, error) {
-	return fmt.Fprint(c.getStdout(), a...)
+	if c.Stdout == nil {
+		return 0, nil
+	}
+	return fmt.Fprint(c.Stdout, a...)
 }
 
 // Println prints to stdout.
 func (c *Cmd) Println(a ...interface{}) (int, error) {
-	return fmt.Fprintln(c.getStdout(), a...)
+	if c.Stdout == nil {
+		return 0, nil
+	}
+	return fmt.Fprintln(c.Stdout, a...)
 }
 
 // Printf prints to stdout.
 func (c *Cmd) Printf(format string, a ...interface{}) (int, error) {
-	return fmt.Fprintf(c.getStdout(), format, a...)
+	if c.Stdout == nil {
+		return 0, nil
+	}
+	return fmt.Fprintf(c.Stdout, format, a...)
 }
 
 // Eprint prints to stderr.
 func (c *Cmd) Eprint(a ...interface{}) (int, error) {
-	return fmt.Fprint(c.getStderr(), a...)
+	if c.Stderr == nil {
+		return 0, nil
+	}
+	return fmt.Fprint(c.Stderr, a...)
 }
 
 // Eprintln prints to stderr.
 func (c *Cmd) Eprintln(a ...interface{}) (int, error) {
-	return fmt.Fprintln(c.getStderr(), a...)
+	if c.Stderr == nil {
+		return 0, nil
+	}
+	return fmt.Fprintln(c.Stderr, a...)
 }
 
 // Eprintf prints to stderr.
 func (c *Cmd) Eprintf(format string, a ...interface{}) (int, error) {
-	return fmt.Fprintf(c.getStderr(), format, a...)
-}
-
-func (c *Cmd) getStdout() io.Writer {
-	if c.Stdout != nil {
-		return c.Stdout
+	if c.Stderr == nil {
+		return 0, nil
 	}
-	return os.Stdout
-}
-
-func (c *Cmd) getStderr() io.Writer {
-	if c.Stderr != nil {
-		return c.Stderr
-	}
-	return os.Stderr
+	return fmt.Fprintf(c.Stderr, format, a...)
 }

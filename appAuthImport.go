@@ -67,13 +67,13 @@ func (app *App) AuthImport(ctx context.Context, users []*auth.ExportedUserRecord
 }
 
 // ParseHashConfig parses hash config following the format below:
-// hash_config {
-//   algorithm: SCRYPT,
-//   base64_signer_key: <base64string>,
-//   base64_salt_separator: <base64string>,
-//   rounds: <integer>,
-//   mem_cost: <integer>,
-// }
+//   hash_config {
+//     algorithm: SCRYPT,
+//     base64_signer_key: <base64string>,
+//     base64_salt_separator: <base64string>,
+//     rounds: <integer>,
+//     mem_cost: <integer>,
+//   }
 func ParseHashConfig(hashConfig string) (hashKey, saltSeparator string, rounds, memCost int, err error) {
 	re := regexp.MustCompile(`hash_config\s*{\s*
 \s*algorithm\s*:\s*SCRYPT\s*,\s*

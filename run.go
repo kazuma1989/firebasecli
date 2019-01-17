@@ -1,12 +1,12 @@
 package firebasecli
 
-// DefaultCommands holds the default sub commands.
-var DefaultCommands = NewCmd()
+// DefaultCmd holds the default sub commands.
+var DefaultCmd = NewCmd()
 
 // Run starts the app.
-var Run = DefaultCommands.Run
+var Run = DefaultCmd.Run
 
 func init() {
-	DefaultCommands.Sub["auth"] = RunnableFunc(DefaultCommands.Auth)
-	DefaultCommands.Sub["db"] = RunnableFunc(DefaultCommands.Db)
+	DefaultCmd.Sub["auth"] = RunnableFunc(DefaultCmd.Auth)
+	DefaultCmd.Sub["db"] = RunnableFunc(DefaultCmd.Db)
 }
