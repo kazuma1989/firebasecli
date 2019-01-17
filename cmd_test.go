@@ -18,7 +18,7 @@ func ExampleNewCmd() {
 	cmd.Db("list")
 }
 
-func ExampleNewCmd_suppress_stdout() {
+func ExampleNewCmd_suppressStdout() {
 	cmd := firebasecli.NewCmd()
 	cmd.Stdout = nil
 	cmd.Stderr = nil
@@ -40,7 +40,7 @@ func ExampleCmd_Run() {
 	// Output: [sub1 arg1 arg2]
 }
 
-func ExampleCmd_Run_add_your_commands() {
+func ExampleCmd_Run_addYourCommands() {
 	firebasecli.DefaultCmd.Sub["foo"] = firebasecli.RunnableFunc(func(args ...string) error {
 		fmt.Println(args)
 		return nil

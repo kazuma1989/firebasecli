@@ -3,16 +3,12 @@ package firebasecli
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"strings"
 
 	"firebase.google.com/go/auth"
 	docopt "github.com/docopt/docopt-go"
 )
-
-// ErrFailedToParseHashConfig is returned when hash config file does not follow the format.
-var ErrFailedToParseHashConfig = errors.New("failed to parse hash_config")
 
 // Auth manipulates Firebase Authentication.
 func (c *Cmd) Auth(args ...string) error {

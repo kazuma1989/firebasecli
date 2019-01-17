@@ -17,7 +17,7 @@ func (c *myCmd) Run(args ...string) error {
 	return fmt.Errorf("failure from Run")
 }
 
-func ExampleCmd_Run_impl_myCmd() {
+func ExampleCmd_Run_implMyCmd() {
 	cmdFooBar := func(args ...string) error {
 		fmt.Println(args)
 		return fmt.Errorf("failure from foo bar")

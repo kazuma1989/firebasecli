@@ -2,22 +2,10 @@ package firebasecli
 
 import (
 	"context"
-	"errors"
 	"sort"
 	"strings"
 
 	docopt "github.com/docopt/docopt-go"
-)
-
-// Version of the firebasecli.
-const Version = "0.0.1"
-
-var (
-	// ErrFailedToParseArgs is returned when args are not parseable.
-	ErrFailedToParseArgs = errors.New("failed to parse args")
-
-	// ErrUnknownCommand is returned when a given command is unknown/undefined.
-	ErrUnknownCommand = errors.New("unknown command")
 )
 
 // Run starts a sub command.
