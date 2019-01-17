@@ -10,11 +10,10 @@ import (
 
 // Run starts a sub command.
 func (c *Cmd) Run(args ...string) error {
-	usage := `
-Manipulate Firebase as an admin.
+	usage := `Manipulate Firebase as an admin.
 
 Usage:
-  firebasecli [-c FILE] COMMAND [ARGS...]
+  firebasecli [-c FILE] [COMMAND ARGS...]
   firebasecli -h
 
 Options:
@@ -27,6 +26,9 @@ Available commands:
   `
 	var availableCommands []string
 	for k := range c.Sub {
+		if k == "" {
+			continue
+		}
 		availableCommands = append(availableCommands, k)
 	}
 	sort.Strings(availableCommands)
