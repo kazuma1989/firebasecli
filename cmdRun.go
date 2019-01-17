@@ -62,7 +62,7 @@ Available commands:
 		return ErrFailedToParseArgs
 	}
 
-	run, ok := c.Sub[arg.Command]
+	runnable, ok := c.Sub[arg.Command]
 	if !ok {
 		return ErrUnknownCommand
 	}
@@ -75,5 +75,5 @@ Available commands:
 	}
 
 	_args := append([]string{arg.Command}, arg.Args...)
-	return run(_args...)
+	return runnable.Run(_args...)
 }

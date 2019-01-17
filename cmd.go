@@ -9,7 +9,7 @@ import (
 // Cmd executes command.
 type Cmd struct {
 	// Sub holds commands.
-	Sub map[string]func(...string) error
+	Sub map[string]Runnable
 
 	App    *App
 	Stdout io.Writer
@@ -19,7 +19,7 @@ type Cmd struct {
 // NewCmd returns a new initialized Cmd.
 func NewCmd() *Cmd {
 	return &Cmd{
-		make(map[string]func(...string) error),
+		make(map[string]Runnable),
 
 		&App{},
 		os.Stdout,

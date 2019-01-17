@@ -7,6 +7,6 @@ var DefaultCommands = NewCmd()
 var Run = DefaultCommands.Run
 
 func init() {
-	DefaultCommands.Sub["auth"] = DefaultCommands.Auth
-	DefaultCommands.Sub["db"] = DefaultCommands.Db
+	DefaultCommands.Sub["auth"] = RunnableFunc(DefaultCommands.Auth)
+	DefaultCommands.Sub["db"] = RunnableFunc(DefaultCommands.Db)
 }
