@@ -10,5 +10,5 @@ type RunnableFunc func(...string) error
 
 // Run implements Runnable.
 func (f RunnableFunc) Run(args ...string) error {
-	return f()
+	return f(args...)
 }
