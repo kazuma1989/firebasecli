@@ -15,4 +15,5 @@ func init() {
 	})
 	DefaultCmd.Sub["auth"] = RunnableFunc(DefaultCmd.Auth)
 	DefaultCmd.Sub["db"] = RunnableFunc(DefaultCmd.Db)
+	DefaultCmd.Sub["storage"] = RunnableFunc(DefaultCmd.Storage)
 }
